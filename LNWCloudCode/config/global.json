@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "Limitless New Worlds": {
+            "applicationId": "Hqyeq2RJYdLqmulAVqKrD0Vf3NwuJNCUyp2X9B1N", 
+            "masterKey": "7eED3xSc5RY4Gs1ZPLzm0ipZxEywOcBA5PCc6NTZ"
+        }, 
+        "_default": {
+            "link": "Limitless New Worlds"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.3.2"
+    }
+}
