@@ -1,18 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Generator : MonoBehaviour
+public class Generator : Singleton<Generator>
 {
-		private const float max = 25.0f;
-		private const float boxSize = 8.0f;
-		private const float gapSize = 8.0f;
+		private const float chunkOfMapToLoad = 128.0f;
+		private const float reloadGranularity = chunkOfMapToLoad / 4.0f;
 
+		private const float maxCubeSize = 64.0f;
+		private const float minCubeSize = 8.0f;
 
-		// Use this for initialization
+		private Vector3 lastLoadLocation;
+
+		private GameObject player;
+	
 		void Start ()
 		{
 
-				for (float x = (boxSize + gapSize)/2.0f; x < max; x += (boxSize + gapSize)) {
+				DebugUtils.Assert (IsPowerOfTwo ((int)chunkOfMapToLoad));
+
+				if (NetworkManager.ThisPlayerSpawned != null)
+						NetworkManager.ThisPlayerSpawned += ThisPlayerSpawned;
+
+				/*		for (float x = (boxSize + gapSize)/2.0f; x < max; x += (boxSize + gapSize)) {
 						for (float y = boxSize/2.0f; y < max; y += boxSize) {
 								for (float z = (boxSize + gapSize)/2.0f; z < max; z += (boxSize + gapSize)) {
 
@@ -35,12 +44,58 @@ public class Generator : MonoBehaviour
 										cube3.transform.position = new Vector3 (-x, y, -z);
 								}	
 						}
+				} */
+		}
+
+		void Update ()
+		{
+		
+		}
+	
+		void AttemptToLoadObjectAtLocationWithSize (Vector3 location, float size)
+		{
+				float depth = maxCubeSize / minCubeSize - size / minCubeSize;
+
+				Object resource = Resources.Load ("UserPrefabs/1-1", typeof(GameObject));
+				GameObject instance;
+		
+				if (resource) {
+						instance = Instantiate (resource) as GameObject;
+						Debug.Log ("SHOCKED FACE");
 				}
 		}
 	
-		// Update is called once per frame
-		void Update ()
+		void UpdateMap ()
 		{
-	
+				Vector3 loadLocation = player.transform.position;
+				int roundNumber = (int)(chunkOfMapToLoad / 2.0f);
+				loadLocation.x = (int)loadLocation.x & ~roundNumber;
+				loadLocation.y = 0;
+				loadLocation.z = (int)loadLocation.z & ~roundNumber;
+
+				AttemptToLoadObjectAtLocationWithSize (new Vector3 ((loadLocation.x - maxCubeSize / 2.0f), 0.0f, (loadLocation.z - maxCubeSize / 2.0f)), maxCubeSize);
+				AttemptToLoadObjectAtLocationWithSize (new Vector3 ((loadLocation.x - maxCubeSize / 2.0f), 0.0f, (loadLocation.z + maxCubeSize / 2.0f)), maxCubeSize);
+				AttemptToLoadObjectAtLocationWithSize (new Vector3 ((loadLocation.x + maxCubeSize / 2.0f), 0.0f, (loadLocation.z - maxCubeSize / 2.0f)), maxCubeSize);
+				AttemptToLoadObjectAtLocationWithSize (new Vector3 ((loadLocation.x + maxCubeSize / 2.0f), 0.0f, (loadLocation.z + maxCubeSize / 2.0f)), maxCubeSize);
+
+				lastLoadLocation = player.transform.position;
 		}
+
+		void ThisPlayerSpawned (GameObject spawnedPlayer)
+		{
+				player = spawnedPlayer;
+				UpdateMap ();
+		}
+
+		bool IsPowerOfTwo (int x)
+		{
+				return (x != 0) && ((x & (x - 1)) == 0);
+		}
+
+		void OnDestroy ()
+		{
+				if (NetworkManager.ThisPlayerSpawned != null)
+						NetworkManager.ThisPlayerSpawned -= ThisPlayerSpawned;
+		}
+	
 }

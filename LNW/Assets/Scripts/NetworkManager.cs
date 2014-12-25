@@ -1,9 +1,20 @@
 using UnityEngine;
 using System.Collections;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkManager : Singleton<NetworkManager>
 {
-		private const string typeName = "DaBomb";
+
+		/*	Demo C# Delegation
+    public delegate void EnergyTypeClickEventHandler(EnergySelection energyType);
+	public static EnergyTypeClickEventHandler EnergyChange; check if null
+	EnergyChange(currentEnergyType);
+	EnergyTypeClickHandler.EnergyChange += EnergyChange;
+	EnergyTypeClickHandler.EnergyChange -= EnergyChange;  */
+
+		public delegate void ThisPlayerSpawnEventHandler (GameObject player);
+		public static ThisPlayerSpawnEventHandler ThisPlayerSpawned;
+	
+		private const string typeName = "LimitlessNewWorlds";
 		private const string gameName = PersonalConstants.ROOM_NAME;
 
 		private bool isRefreshingHostList = false;
@@ -39,7 +50,7 @@ public class NetworkManager : MonoBehaviour
 
 		void OnServerInitialized ()
 		{
-				SpawnNonplayer ();
+				SpawnMainPlayer ();
 		}
 
 		void Update ()
@@ -69,13 +80,15 @@ public class NetworkManager : MonoBehaviour
 				SpawnPlayer ();
 		}
 
-		private void SpawnNonplayer ()
+		private void SpawnMainPlayer ()
 		{
-				Network.Instantiate (nonplayerPrefab, Vector3.up * 5, Quaternion.identity, 0);
+				GameObject player = Network.Instantiate (nonplayerPrefab, Vector3.up * 5, Quaternion.identity, 0) as GameObject;
+				if (ThisPlayerSpawned != null)
+						ThisPlayerSpawned (player);
 		}
 
 		private void SpawnPlayer ()
 		{
-				Network.Instantiate (playerPrefab, Vector3.up * 5, Quaternion.identity, 0);
+				GameObject player = Network.Instantiate (playerPrefab, Vector3.up * 5, Quaternion.identity, 0) as GameObject;
 		}
 }

@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{2843706A-FA51-EB0D-2F7B-AB2F31B6046E}</ProjectGuid>
+	<ProjectGuid>{EABDC5E0-B9D5-04DF-D679-C5AC83DC2005}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -72,10 +72,10 @@
      <None Include="Assets\LeapMotion\Shaders\LeapDistorted.shader" />
      <None Include="Assets\LeapMotion\Shaders\LeapUndistorted.shader" />
  <Reference Include="Parse.Unity">
- <HintPath>C:/Users/guita_000/Documents/GitHub/LNW/DaGame/Assets/Parse.Unity.dll</HintPath>
+ <HintPath>C:/Users/guita_000/Documents/GitHub/LimitlessNewWorlds/LNW/Assets/Parse.Unity.dll</HintPath>
  </Reference>
  <Reference Include="LeapCSharp.NET3.5">
- <HintPath>C:/Users/guita_000/Documents/GitHub/LNW/DaGame/Assets/Plugins/LeapCSharp.NET3.5.dll</HintPath>
+ <HintPath>C:/Users/guita_000/Documents/GitHub/LimitlessNewWorlds/LNW/Assets/Plugins/LeapCSharp.NET3.5.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
