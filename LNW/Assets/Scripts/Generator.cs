@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 using System.Collections;
 
 public class Generator : Singleton<Generator>
@@ -49,20 +50,28 @@ public class Generator : Singleton<Generator>
 
 		void Update ()
 		{
-		
+				if (Mathf.Abs (player.transform.position.x - lastLoadLocation.x) > reloadGranularity || 
+						Mathf.Abs (player.transform.position.z - lastLoadLocation.z) > reloadGranularity)
+						UpdateMap ();
 		}
 	
-		void AttemptToLoadObjectAtLocationWithSize (Vector3 location, float size)
+		void AttemptToLoadObjectsAtPath (string path)
 		{
-				float depth = maxCubeSize / minCubeSize - size / minCubeSize;
-
-				Object resource = Resources.Load ("UserPrefabs/1-1", typeof(GameObject));
-				GameObject instance;
-		
-				if (resource) {
-						instance = Instantiate (resource) as GameObject;
-						Debug.Log ("SHOCKED FACE");
+				DirectoryInfo dir = new DirectoryInfo (path);
+				FileInfo[] info = dir.GetFiles ("*.prefab");
+				foreach (FileInfo f in info) {
+						string name = f.Name.Replace (".prefab", "");
+						string fullPath = path + "/" + name;
+						Object resource = Resources.Load (fullPath, typeof(GameObject));
+						string[] args = name.Split ('-');
+						GameObject instance;
+						if (resource) {
+								instance = Instantiate (resource) as GameObject;
+								instance.transform.position = new Vector3 (float.Parse (args [0]), float.Parse (args [1]), float.Parse (args [2]));
+								Debug.Log ("SHOCKED FACE");
+						}
 				}
+
 		}
 	
 		void UpdateMap ()
@@ -73,10 +82,9 @@ public class Generator : Singleton<Generator>
 				loadLocation.y = 0;
 				loadLocation.z = (int)loadLocation.z & ~roundNumber;
 
-				AttemptToLoadObjectAtLocationWithSize (new Vector3 ((loadLocation.x - maxCubeSize / 2.0f), 0.0f, (loadLocation.z - maxCubeSize / 2.0f)), maxCubeSize);
-				AttemptToLoadObjectAtLocationWithSize (new Vector3 ((loadLocation.x - maxCubeSize / 2.0f), 0.0f, (loadLocation.z + maxCubeSize / 2.0f)), maxCubeSize);
-				AttemptToLoadObjectAtLocationWithSize (new Vector3 ((loadLocation.x + maxCubeSize / 2.0f), 0.0f, (loadLocation.z - maxCubeSize / 2.0f)), maxCubeSize);
-				AttemptToLoadObjectAtLocationWithSize (new Vector3 ((loadLocation.x + maxCubeSize / 2.0f), 0.0f, (loadLocation.z + maxCubeSize / 2.0f)), maxCubeSize);
+				string path = (loadLocation.x - maxCubeSize / 2.0f) / (maxCubeSize / 2.0f) + "-" + (loadLocation.z - maxCubeSize / 2.0f) / (maxCubeSize / 2.0f);
+			
+				AttemptToLoadObjectsAtPath (path);
 
 				lastLoadLocation = player.transform.position;
 		}
